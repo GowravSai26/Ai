@@ -1,0 +1,6 @@
+llm_project/
+│
+├── .env                      # contains your API key
+├── llm_backend.py            # FastAPI backend
+├── frontend_ui.py            # Streamlit frontend
+└── requirements.txt          # (optional) all dependencies

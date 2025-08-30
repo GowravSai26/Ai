@@ -1,0 +1,93 @@
+# frontend.py
+import streamlit as st
+import requests
+
+# 🌍 FastAPI base URL
+BASE_URL = "http://localhost:8000"
+
+# ----------------------------------
+# 🧭 Navigation Menu
+# ----------------------------------
+page = st.sidebar.selectbox("Select Page", ["View Items", "Add Item", "Update Item", "Delete Item", "Search"])
+
+# ----------------------------------
+# 👁️ View All Items
+# ----------------------------------
+if page == "View Items":
+    st.title("📦 Inventory - View Items")
+    brand = st.text_input("Filter by Brand (optional)")
+    if st.button("Fetch Items"):
+        response = requests.get(f"{BASE_URL}/items", params={"brand": brand} if brand else {})
+        st.json(response.json())
+
+# ----------------------------------
+# ➕ Add New Item
+# ----------------------------------
+elif page == "Add Item":
+    st.title("➕ Add New Item")
+    item_id = st.number_input("Item ID", min_value=1, step=1)
+    name = st.text_input("Item Name")
+    price = st.number_input("Price", min_value=0.0)
+    brand = st.text_input("Brand")
+    tags = st.text_input("Tags (comma-separated)")
+
+    if st.button("Add Item"):
+        payload = {
+            "name": name,
+            "price": price,
+            "brand": brand,
+            "tags": [t.strip() for t in tags.split(",") if t]
+        }
+        response = requests.post(f"{BASE_URL}/items/{item_id}", json=payload)
+        st.json(response.json())
+
+# ----------------------------------
+# 🔁 Update Item
+# ----------------------------------
+elif page == "Update Item":
+    st.title("🔁 Update Existing Item")
+    item_id = st.number_input("Item ID to Update", min_value=1, step=1)
+    name = st.text_input("New Name (optional)")
+    price = st.text_input("New Price (optional)")
+    brand = st.text_input("New Brand (optional)")
+    tags = st.text_input("New Tags (comma-separated)")
+
+    if st.button("Update"):
+        payload = {}
+        if name: payload["name"] = name
+        if price: payload["price"] = float(price)
+        if brand: payload["brand"] = brand
+        if tags: payload["tags"] = [t.strip() for t in tags.split(",") if t]
+        response = requests.put(f"{BASE_URL}/items/{item_id}", json=payload)
+        st.json(response.json())
+
+# ----------------------------------
+# ❌ Delete Item
+# ----------------------------------
+elif page == "Delete Item":
+    st.title("❌ Delete Item")
+    item_id = st.number_input("Item ID to Delete", min_value=1, step=1)
+
+    if st.button("Delete"):
+        response = requests.delete(f"{BASE_URL}/items/{item_id}")
+        st.json(response.json())
+
+# ----------------------------------
+# 🔍 Search by Name (custom POST)
+# ----------------------------------
+elif page == "Search":
+    st.title("🔍 Search Items by Keyword")
+    keyword = st.text_input("Search Keyword")
+    if st.button("Search"):
+        response = requests.post(f"{BASE_URL}/search/", json=keyword)
+        st.json(response.json())
+
+
+
+
+To run Streamlit:
+-----------------
+streamlit run frontend.py
+
+
+

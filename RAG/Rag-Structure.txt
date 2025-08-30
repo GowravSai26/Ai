@@ -1,0 +1,128 @@
+## **RAG Skill Roadmap**
+
+### **1️⃣ Understanding the Core RAG Flow**
+
+Before you start coding, you need to understand the exact **pipeline**:
+
+1. **Ingestion** → Load raw data (PDF, CSV, DOCX, Web pages, APIs)
+2. **Chunking** → Split into small passages (e.g., 500 tokens)
+3. **Embedding** → Convert chunks into numerical vectors
+4. **Indexing** → Store vectors in a Vector DB (FAISS, Chroma, Pinecone, Weaviate, Milvus)
+5. **Retrieval** → On user query, fetch relevant chunks using similarity search
+6. **Generation** → Feed both the query + retrieved chunks into an LLM to generate the answer
+7. **(Optional) Re-ranking** → Improve quality of retrieved chunks
+8. **(Optional) Caching** → Store past results for faster future queries
+
+---
+
+### **2️⃣ Things You Must Learn & Master**
+
+Here’s the **checklist** for a **complete RAG engineer skillset**:
+
+#### **A. Data Loading**
+
+* LangChain document loaders (`PyPDFLoader`, `UnstructuredFileLoader`, `CSVLoader`)
+* Web scraping loaders (`WebBaseLoader`, `Selenium`, `BeautifulSoup`)
+* API data ingestion
+
+#### **B. Text Chunking**
+
+* `RecursiveCharacterTextSplitter`
+* Overlap tuning (to preserve context between chunks)
+* Choosing chunk size based on model context window
+
+#### **C. Embeddings**
+
+* OpenAI embeddings (`text-embedding-3-large`)
+* Google embeddings (`models/embedding-gecko`)
+* HuggingFace models (`sentence-transformers`, `instructor-xl`)
+* Local embedding generation with GPU acceleration
+
+#### **D. Vector Databases**
+
+* Local: **Chroma**, **FAISS**
+* Cloud: **Pinecone**, **Weaviate**, **Milvus**, **Qdrant**
+* CRUD operations (Create, Read, Update, Delete)
+* Filtering & metadata search
+
+#### **E. Retrieval**
+
+* Similarity search
+* `max_marginal_relevance_search` (MMR) for diversity
+* Hybrid search (BM25 + embeddings)
+* Using retrievers in LangChain
+
+#### **F. RAG Pipelines**
+
+* **Basic RetrievalQA** (Query → Retrieve → LLM)
+* **Stuff / Map-Reduce / Refine** chain types
+* Prompt templates for RAG (context injection)
+* Context compression (reduce irrelevant data)
+
+#### **G. Advanced RAG**
+
+* Re-ranking with cross-encoders (BERT-based models)
+* Multi-vector retrieval (different embedding spaces)
+* Query transformation (expand/rewrite user query)
+* Using **LangGraph** for multi-step retrieval logic
+
+#### **H. Evaluation**
+
+* RAGAS (Retrieval-Augmented Generation Assessment)
+* Precision, Recall, F1-score for retrieval
+* Latency optimization
+
+---
+
+### **3️⃣ Structure of a RAG Project**
+
+When you build a RAG project, it’s usually structured like this:
+
+```
+rag_project/
+│
+├── data/                  # PDFs, CSVs, text files, raw data
+├── ingest.py              # Load, chunk, embed, and index data
+├── query.py               # Take user question, retrieve chunks, call LLM
+├── retriever.py           # Retrieval logic
+├── config.py              # API keys, model settings
+├── utils.py               # Helper functions
+├── requirements.txt       # Dependencies
+└── app.py                 # Frontend (Streamlit/FastAPI)
+```
+
+---
+
+### **4️⃣ Sequence to Learn RAG (Coding First, Theory Along the Way)**
+
+1. **Basic LLM → RAG**
+
+   * Start with a simple OpenAI or Gemini chatbot
+   * Modify it to retrieve data from a small local vector store
+
+2. **Add Chunking & Embeddings**
+
+   * Play with different chunk sizes and see results
+   * Test different embedding models
+
+3. **Vector DB Mastery**
+
+   * Store, search, and delete data in Chroma/FAISS
+   * Connect Pinecone or Weaviate for larger datasets
+
+4. **Advanced Retrieval**
+
+   * Implement MMR search, filters, metadata-based queries
+
+5. **Improve RAG**
+
+   * Re-ranking with HuggingFace models
+   * Query rewriting (e.g., HyDE)
+
+6. **Full Pipeline Deployment**
+
+   * Make an ingest pipeline script
+   * Deploy RAG backend with FastAPI
+   * Build a Streamlit frontend
+
+

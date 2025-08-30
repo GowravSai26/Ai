@@ -1,0 +1,38 @@
+# Import the requests library to make HTTP calls to the backend API
+import requests
+
+# Import Streamlit to build the frontend UI
+import streamlit as st
+
+# Title of the web app
+st.title("💬 Gemini Chat - Powered by FastAPI")
+
+# Add a text input field for the user to enter a question
+user_input = st.text_input("Enter your question:")
+
+# Add a submit button (optional but clearer UI)
+if st.button("Submit"):
+    # Check if user actually typed something
+    if user_input.strip() != "":
+        with st.spinner("Thinking..."):
+            try:
+                # Make a POST request to the FastAPI backend running at localhost:8000
+                response = requests.post(
+                    url="http://localhost:8000/ask",  # Backend endpoint
+                    json={"question": user_input}     # Payload (must match backend schema)
+                )
+                
+                # If response is OK, extract and display the answer
+                if response.status_code == 200:
+                    result = response.json()
+                    st.success("Gemini's Response:")
+                    st.write(result["response"])  # Display the response from backend
+                else:
+                    # Handle case when API returns an error
+                    st.error("Something went wrong. Please try again.")
+            except Exception as e:
+                # Handle case when API is unreachable or crashes
+                st.error(f"Error: {e}")
+    else:
+        # Handle case when user submits empty input
+        st.warning("Please enter a question before submitting.")

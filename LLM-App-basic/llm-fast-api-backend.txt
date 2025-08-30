@@ -1,0 +1,60 @@
+# Importing FastAPI to create the API app
+from fastapi import FastAPI, Request
+
+# Importing pydantic BaseModel to define request and response schemas (data validation)
+from pydantic import BaseModel
+
+# Importing Google Gemini wrapper from LangChain to use Gemini LLM
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+# Importing HumanMessage to structure our input to the LLM
+from langchain_core.messages import HumanMessage
+
+# CORS middleware allows frontend (like Streamlit) to talk to backend from a different domain/port
+from fastapi.middleware.cors import CORSMiddleware
+
+# Create the Gemini LLM instance with your config
+llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash",   # You can also use gemini-1.5-pro if needed
+    temperature=0.7,            # Controls creativity: 0 is deterministic, 1 is creative
+    max_tokens=None,            # Set max output length (optional)
+    timeout=None,               # No request timeout
+    max_retries=2,              # Retry if the model fails
+    api_key="your-api-key"      # Your Gemini API key (ideally store in .env for security)
+)
+
+# Instantiate the FastAPI app
+app = FastAPI(
+    title="Gemini LLM Backend",     # Metadata for docs (localhost:8000/docs)
+    description="Handles LLM query processing using LangChain and Gemini.",
+    version="1.0"
+)
+
+# Enable Cross-Origin Resource Sharing to allow frontend from other ports to access this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],            # Allows all origins (open access)
+    allow_credentials=True,
+    allow_methods=["*"],            # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"]            # Allow all headers
+)
+
+# Define the request format the frontend must follow
+class QueryRequest(BaseModel):
+    question: str   # Only one field expected: "question" of type string
+
+# Define the response format to send back to frontend
+class QueryResponse(BaseModel):
+    response: str   # Response will be a single string
+
+# POST API endpoint that takes a question and returns LLM-generated response
+@app.post("/ask", response_model=QueryResponse)
+async def ask_gemini(request: QueryRequest):
+    # Convert user's question to a message format expected by LangChain
+    message = HumanMessage(content=request.question)
+    
+    # Send the message to Gemini via LangChain and get the result
+    response = llm.invoke([message])
+    
+    # Return the result content as JSON
+    return {"response": response.content}
